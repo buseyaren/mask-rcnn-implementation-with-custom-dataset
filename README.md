@@ -20,17 +20,17 @@ While examining Mask R-CNN, we should remember that Faster R-CNN consists of two
     NUM_CLASSES = 1 + 5  # Background + classname, for instance, if there are 5 classes, specify 1+5.
 ``` 
 
-&rarr; Custom classes has to been added to self attribute in creating a synthetic dataset step:
+&rarr; Custom classes has to been added to self attribute in creating a synthetic dataset step. In here "configclassname" specifies the superclass in json annotation file inside the "Categories" key.
 ```
 class customDataset(utils.Dataset):
 
     def load_class(self, dataset_dir, subset):
     ...
-        self.add_class("configclassname1", 1, "class1")
-        self.add_class("configclassname2", 2, "class2")
-        self.add_class("configclassname3", 3, "class3")
-        self.add_class("configclassname4", 4, "class4")
-        self.add_class("configclassname5", 5, "class5")
+        self.add_class("configclassname", 1, "class1")
+        self.add_class("configclassname", 2, "class2")
+        self.add_class("configclassname", 3, "class3")
+        self.add_class("configclassname", 4, "class4")
+        self.add_class("configclassname", 5, "class5")
     ...
 ```
 
@@ -57,10 +57,34 @@ class customDataset(utils.Dataset):
     def load_mask(self, image_id):
     ...
 ```
+&rarr; "configclassname" also has to be changed in following sections.
+```
+    def image_reference(self, image_id):
+        ...
+        if info["source"] == "configclassname":
+            ...
+```
+```
+class customDataset(utils.Dataset):
+
+    def load_class(self, dataset_dir, subset):
+        for img in images:
+            ...
+            self.add_image(
+                "configclassname", #custom super class name
+                ...
+```
+
+```
+class customDataset(utils.Dataset):
+    def load_mask(self, image_id):
+        if image_info["source"] != "configclassname":
+            ...
+```
 
 # Appendices
 
-More info about Mask R-CNN:
+More information about Mask R-CNN:
 
 &rarr; **Medium**
 * [Mask R-CNN Overlapping Bounding Boxes Problem](https://pub.towardsai.net/mask-r-cnn-overlapping-bounding-boxes-problem-a9582d41875b)
